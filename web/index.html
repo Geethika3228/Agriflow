@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AgriFlow Algorithm Lab</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#e9efe9; --card:#f7faf6; --ink:#17213b; --muted:#56627d; --line:#c9d4cb;
+  --blue:#2f6fde; --green:#2d8a57; --coral:#d4503f; --gold:#e8a91d; --teal:#17808f; --violet:#6b4fc2;
+  --mc:var(--ink);
+  --font:'Bricolage Grotesque',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root{--paper:#0f1626; --card:#172037; --ink:#e6ebf7; --muted:#9aa6c4; --line:#2a3552;
+        --blue:#6ea0ff; --green:#5cc88a; --coral:#ff8470; --gold:#f2bf4b; --teal:#52c0d0; --violet:#a28cf0;}
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 var(--font);}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.shell{display:grid;grid-template-columns:230px minmax(0,1fr);gap:0;max-width:1240px;margin:0 auto}
+nav{position:sticky;top:0;align-self:start;height:100vh;padding:28px 18px;overflow:auto;border-right:1px solid var(--line)}
+nav h1{font-size:28px;line-height:1;margin:0 0 4px;font-weight:800;letter-spacing:-.02em}
+nav p{margin:0 0 22px;color:var(--muted);font-size:13px}
+nav a{display:block;padding:8px 10px;border-radius:8px;text-decoration:none;font-size:14px;border-left:4px solid var(--c);margin-bottom:6px}
+nav a:hover{background:var(--card)}
+nav a small{display:block;color:var(--muted);font-size:12px}
+#health{margin-top:20px;font:12px var(--mono);color:var(--muted)}
+main{padding:28px 28px 80px;min-width:0}
+.hero{padding:6px 0 26px}
+.hero h2{font-size:clamp(30px,5vw,52px);line-height:1.02;letter-spacing:-.03em;margin:0 0 12px;font-weight:800;max-width:15em}
+.hero p{max-width:60ch;color:var(--muted);margin:0 0 8px}
+.rule{display:inline-block;padding:3px 10px;border:1.5px solid var(--ink);border-radius:99px;font:12px var(--mono);margin-top:6px}
+.module{margin-top:44px;--mc:var(--ink)}
+.module>header{border-bottom:3px solid var(--mc);padding-bottom:8px;margin-bottom:18px}
+.module>header h2{margin:0;font-size:26px;letter-spacing:-.02em}
+.module>header p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.lab{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--mc);border-radius:10px;padding:18px 20px;margin-bottom:18px}
+.lab h3{margin:0 0 4px;font-size:20px;letter-spacing:-.01em}
+.lab .cost{font:12px var(--mono);color:var(--mc);margin-bottom:8px}
+details.eli{margin:6px 0 12px;font-size:15px;max-width:72ch}
+details.eli summary{cursor:pointer;font-weight:600;color:var(--mc)}
+details.eli p{margin:6px 0 0}
+.ctl{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:flex-end;margin-bottom:10px}
+.f{display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--muted)}
+.f input,.f select,.f textarea{font:14px var(--mono);padding:7px 9px;border:1.5px solid var(--line);border-radius:7px;background:var(--paper);color:var(--ink);min-width:0}
+.f input{width:150px}.f input.w2{width:260px}.f input.w3{width:100%}.f input.s{width:76px}
+.f.grow{flex:1 1 320px}.f textarea{width:100%;min-height:64px;resize:vertical}
+.f select{max-width:240px}
+.checks{display:flex;flex-wrap:wrap;gap:6px}
+.checks label{display:flex;gap:5px;align-items:center;font-size:13px;color:var(--ink);padding:3px 8px;border:1.5px solid var(--line);border-radius:99px;cursor:pointer}
+.checks input{width:auto;accent-color:var(--mc)}
+button.run{font:600 14px var(--font);padding:8px 16px;border-radius:8px;border:0;background:var(--mc);color:var(--paper);cursor:pointer}
+button.run:hover{filter:brightness(1.1)}
+button.alt{font:600 13px var(--font);padding:7px 12px;border-radius:8px;border:1.5px solid var(--mc);background:transparent;color:var(--ink);cursor:pointer}
+.out{min-height:20px;margin-top:6px;overflow-x:auto}
+.out .err{color:var(--coral);font-weight:600}
+.out .wait{color:var(--muted);font:13px var(--mono)}
+.api{font:11px var(--mono);color:var(--muted);margin-top:10px;word-break:break-all}
+.stats{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0}
+.stat{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:8px 12px;min-width:110px}
+.stat b{display:block;font-size:22px;letter-spacing:-.02em;line-height:1.15}
+.stat span{font-size:12px;color:var(--muted)}
+.stat i{display:block;font-size:11px;color:var(--muted);font-style:normal}
+.cells{display:flex;flex-wrap:wrap;gap:3px;margin:4px 0}
+.cell{font:13px var(--mono);min-width:30px;padding:2px 6px 3px;text-align:center;border:1px solid var(--line);border-radius:5px;background:var(--paper)}
+.cell i{display:block;font:10px var(--mono);color:var(--muted);font-style:normal}
+.cell.on{background:var(--mc);color:var(--paper);border-color:var(--mc)}
+.cell.on i{color:inherit;opacity:.7}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.chip{padding:3px 10px;border-radius:99px;border:1.5px solid var(--line);font-size:13px;background:var(--paper)}
+.chip.good{border-color:var(--green);color:var(--green)}.chip.bad{border-color:var(--coral);color:var(--coral)}
+.chip.fill{background:var(--mc);color:var(--paper);border-color:var(--mc)}
+.chip.gold{border-color:var(--gold)}
+mark{background:var(--gold);color:#201400;border-radius:3px;padding:0 1px}
+.txt{font:13px/1.7 var(--mono);word-break:break-word;margin:4px 0 10px}
+.bars{display:grid;gap:5px;margin:8px 0}
+.bar{display:grid;grid-template-columns:minmax(120px,210px) 1fr minmax(100px,auto);gap:10px;align-items:center;font-size:13px}
+.bt{height:14px;background:var(--paper);border-radius:7px;overflow:hidden;border:1px solid var(--line)}
+.bf{display:block;height:100%}
+.bv{font:12px var(--mono);color:var(--muted)}
+table.t{border-collapse:collapse;font-size:13px;margin:8px 0}
+table.t th,table.t td{border-bottom:1px solid var(--line);padding:5px 10px;text-align:left}
+table.t td.num{text-align:right;font-family:var(--mono)}
+table.grid{border-collapse:collapse;font:12px var(--mono);margin:8px 0}
+table.grid td,table.grid th{width:30px;height:28px;text-align:center;border:1px solid var(--line);padding:0}
+table.grid th{color:var(--muted);font-weight:600;background:var(--paper)}
+table.grid td.path{outline:2.5px solid var(--coral);outline-offset:-2px;font-weight:700}
+.align{font:15px/1.35 var(--mono);white-space:pre;margin:8px 0;background:var(--paper);padding:10px 12px;border-radius:8px;overflow-x:auto}
+svg.viz{width:100%;max-width:760px;height:auto;display:block;margin:8px 0;background:var(--paper);border-radius:8px;border:1px solid var(--line)}
+svg.viz text{font:11px var(--font);fill:var(--ink)}
+svg.viz .lbl{paint-order:stroke;stroke:var(--paper);stroke-width:3px;font:600 11px var(--mono)}
+.maps{display:flex;flex-wrap:wrap;gap:12px}.maps>div{flex:1 1 220px;max-width:250px}
+.maps h4{margin:4px 0;font-size:14px}
+.note{font-size:13px;color:var(--muted);max-width:75ch;margin:6px 0}
+.good{color:var(--green)}.bad{color:var(--coral)}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+ul.plain{margin:6px 0;padding-left:20px}
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr}
+  nav{position:static;height:auto;display:flex;flex-wrap:wrap;gap:6px;border-right:0;border-bottom:1px solid var(--line);padding:14px}
+  nav h1,nav p,#health{width:100%;margin:0}
+  nav a{margin:0}
+  main{padding:18px 14px 60px}
+  .bar{grid-template-columns:90px 1fr}.bv{grid-column:1 / -1}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="shell">
+<nav id="nav">
+  <h1>AgriFlow</h1>
+  <p>algorithm lab for the farm data engine</p>
+</nav>
+<main>
+  <section class="hero">
+    <h2>Every algorithm from your syllabus, running on farm data.</h2>
+    <p>All the maths happens in Java on the server. This page only asks questions and draws the answers. Open the "explain it like I'm 10" bit on any lab if the name sounds scary, then poke the inputs and hit Run.</p>
+    <span class="rule">engine rule: hand-built, arrays only, no java.util</span>
+  </section>
+  <div id="app"></div>
+</main>
+</div>
+
+<script>
+/* ============================ tiny helpers ============================ */
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const num = (x, d=2) => typeof x === 'number' ? (Number.isInteger(x) ? x.toLocaleString() : x.toFixed(d)) : x;
+const stat = (k, v, sub) => `<div class="stat"><b>${v}</b><span>${k}</span>${sub ? `<i>${sub}</i>` : ''}</div>`;
+const stats = (...a) => `<div class="stats">${a.join('')}</div>`;
+const cells = (a, hi=[]) => `<div class="cells">${a.map((x,i) => `<span class="cell${hi.includes(i) ? ' on' : ''}"><i>${i}</i>${esc(x === ' ' ? '␣' : x)}</span>`).join('')}</div>`;
+const chips = (a, cls='') => `<div class="chips">${a.map(x => `<span class="chip ${cls}">${esc(x)}</span>`).join('')}</div>`;
+const note = t => `<p class="note">${t}</p>`;
+function bars(rows, unit='') {
+  const mx = Math.max(...rows.map(r => r.v), 1e-9);
+  return `<div class="bars">${rows.map(r => `<div class="bar"><span>${esc(r.l)}</span><span class="bt"><span class="bf" style="width:${Math.max(1, r.v / mx * 100)}%;background:${r.c || 'var(--mc)'}"></span></span><span class="bv">${num(r.v)}${unit} ${r.note || ''}</span></div>`).join('')}</div>`;
+}
+function table(head, rows) {
+  return `<table class="t"><tr>${head.map(h => `<th>${h}</th>`).join('')}</tr>${rows.map(r => `<tr>${r.map(c => `<td${typeof c === 'number' ? ' class="num"' : ''}>${typeof c === 'number' ? num(c) : c}</td>`).join('')}</tr>`).join('')}</table>`;
+}
+function grid(rowLab, colLab, t, path, colorVar='--mc') {
+  const on = new Set(); for (let i = 0; i < path.length; i += 2) on.add(path[i] + ',' + path[i+1]);
+  let lo = 1e18, hi = -1e18; t.forEach(r => r.forEach(v => { if (v > -1e8) { lo = Math.min(lo, v); hi = Math.max(hi, v); } }));
+  const rg = Math.max(1, hi - lo);
+  let h = '<table class="grid"><tr><th></th><th></th>' + [...colLab].map(c => `<th>${esc(c)}</th>`).join('') + '</tr>';
+  t.forEach((r, i) => {
+    h += `<tr><th>${i ? esc(rowLab[i-1]) : ''}</th>` + r.map((v, j) => {
+      const a = v > -1e8 ? 0.08 + 0.55 * (v - lo) / rg : 0;
+      return `<td class="${on.has(i+','+j) ? 'path' : ''}" style="background:color-mix(in srgb, var(${colorVar}) ${Math.round(a*100)}%, transparent)">${v > -1e8 ? v : '·'}</td>`;
+    }).join('') + '</tr>';
+  });
+  return h + '</table>';
+}
+function hl(text, ranges) {
+  ranges = ranges.slice().sort((a, b) => a[0] - b[0]);
+  let out = '', p = 0;
+  for (const [s, l] of ranges) { if (s < p) continue; out += esc(text.slice(p, s)) + '<mark>' + esc(text.slice(s, s + l)) + '</mark>'; p = s + l; }
+  return out + esc(text.slice(p));
+}
+const svg = (w, h, body) => `<svg class="viz" viewBox="0 0 ${w} ${h}" role="img">${body}</svg>`;
+const COL = {blue:'var(--blue)', green:'var(--green)', coral:'var(--coral)', gold:'var(--gold)', ink:'var(--ink)', mute:'var(--muted)', line:'var(--line)'};
+const SITES = ['Rice farm','Wheat farm','Tomato farm','Cotton farm','Maize farm','Groundnut farm','Chilli farm','Potato farm','Soybean farm','Sugarcane farm','Banana farm','Turmeric farm'];
+
+async function api(path, params) {
+  const qs = Object.entries(params).map(([k, v]) => k + '=' + encodeURIComponent(v)).join('&');
+  const url = path + (qs ? '?' + qs : '');
+  const r = await fetch(url);
+  const j = await r.json();
+  if (!r.ok) throw new Error(j.error || r.statusText);
+  return {data: j, url};
+}
+
+/* ============================ renderers (one per endpoint) ============================ */
+const R = {};
+
+R['engine'] = d => stats(stat('farm records', d.records), stat('corpus characters', d.corpusChars), stat('distinct words', d.vocabulary)) +
+  table(['Question a user asks', 'Algorithm that answers it', 'Family', 'Cost', 'Module'], d.classes.map(c => [esc(c.query), esc(c.algorithm), esc(c.family), `<code>${esc(c.cost)}</code>`, c.module])) + note(esc(d.rules));
+
+R['similar'] = d => `<div class="note">Records most like <b>${esc(d.record)}</b>, ranked by the longest piece of text they share. ${esc(d.complexity)}</div>` +
+  bars(d.ranked.map(r => ({l: r.crop, v: r.lcs, note: `“${esc(r.shared.trim().slice(0, 40))}”`})), ' chars');
+
+R['search'] = d => stats(stat('total matches', d.totalMatches), stat('avg time', num(d.elapsedMicros, 1) + ' µs', 'whole knowledge base'), stat('algorithm', esc(d.algorithm)), stat('cost', `<small>${esc(d.complexity)}</small>`)) +
+  (d.results.length ? d.results.map(r => `<div class="txt"><b>${esc(r.crop)}</b> · ${r.matches} hit${r.matches > 1 ? 's' : ''}<br>${hl(r.text, r.positions.map(p => [p, d.query.length]))}</div>`).join('') : note('No record contains that. Try a typo-fixer lab below.'));
+
+R['strlab'] = d => {
+  const cls = r => `${r.hashHits} hash hits, <b class="${r.spurious ? 'bad' : 'good'}">${r.spurious} fake</b>`;
+  return `<div class="txt">${hl(d.text, d.kmpPositions.map(p => [p, d.pattern.length]))}</div>` +
+    stats(stat('matches', d.kmpPositions.length), stat('naive comparisons', d.naiveComparisons), stat('KMP comparisons', d.kmpComparisons)) +
+    `<div class="two"><div><b>KMP failure table (lps)</b>${cells(d.lps.map(String).map((x,i)=>x), [])}<div class="note">Pattern: ${[...d.pattern].map(c=>`<code>${esc(c)}</code>`).join(' ')}. lps[i] is how many characters of the pattern's start you can keep after a mismatch at i.</div></div>
+    <div><b>Z-array of the pattern</b>${cells(d.zPattern.map(String), [])}<div class="note">z[i] is how far the text from i matches the start of the pattern.</div></div></div>` +
+    `<b>Rabin-Karp: do the hashes ever lie?</b>${table(['hash setup', 'result'], [
+      [`one tiny modulus (${d.rkWeak.mod})`, cls(d.rkWeak)],
+      ['two big moduli', cls(d.rkDouble)],
+      [`random prime ${d.rkRandom.mod} (picked by Miller-Rabin this run)`, cls(d.rkRandom)]])}` +
+    note('A "fake" hit means two different strings got the same hash. Rabin-Karp checks every hit letter by letter, so the answer stays correct, it just wastes time on fakes.');
+};
+
+R['race'] = d => {
+  const colors = {Naive: COL.coral, KMP: COL.blue};
+  return stats(stat('text length', d.textLength), stat('pattern length', d.patternLength)) +
+    bars(d.rows.map(r => ({l: r.name, v: r.millis, c: colors[r.name], note: r.comparisons ? `· ${r.comparisons.toLocaleString()} comparisons` : ''})), ' ms') +
+    note(d.mode === 'adversarial'
+      ? 'Worst case for naive: text is all a’s and the pattern ends in b, so every window matches almost to the end before failing. KMP never re-reads text.'
+      : 'On ordinary text naive is fine, because mismatches come early. The suffix array costs a lot to build once and then answers every query in microseconds.') +
+    (d.saIncluded ? '' : note('Suffix array skipped: text is over 150,000 characters.'));
+};
+
+R['multi'] = d => {
+  const ranges = d.matches.map(m => [m.pos, m.len]);
+  return stats(stat('trie nodes', d.trieNodes), stat('failure links', d.failLinks), stat('total hits', d.totalMatches), stat('scan time', num(d.micros, 0) + ' µs')) +
+    bars(d.words.map(w => ({l: w.word, v: w.count})), ' hits') +
+    (d.crops.length ? `<b>Which crops mention them</b>${chips(d.crops.map(c => c.crop + ' ×' + c.hits))}` : `<div class="txt">${hl(d.text, ranges)}</div>`) + note(esc(d.complexity));
+};
+
+R['suffix'] = d => stats(stat('occurrences', d.suffixCount), stat('suffix-array range', `${d.saRange[0]}–${d.saRange[1]}`), stat('shown', d.positions.length)) +
+  (d.positions.length ? `<b>Where (corpus position → crop)</b>${chips(d.positions.map((p, i) => `${p} → ${d.crops[i]}`))}` : note('Not found.')) +
+  (d.lcpSample.length ? `<b>LCP between neighbouring matches</b>${cells(d.lcpSample.map(String))}` : '') + note(esc(d.complexity));
+
+R['repeats'] = d => stats(stat('longest repeat', d.length + ' chars'), stat('different substrings', d.distinctSubstrings.toLocaleString()), stat('in corpus of', d.corpusChars + ' chars')) +
+  `<div class="txt"><mark>${esc(d.repeated)}</mark></div>` + chips(d.crops.map((c, i) => c + ' @' + d.occurrences[i])) + note(esc(d.note));
+
+R['edit-distance'] = d => stats(stat('words compared', d.vocabulary), stat('mode', esc(d.mode))) +
+  `<div class="chips">${d.results.map((r, i) => `<span class="chip ${i === 0 ? 'fill' : ''}">${esc(r.term)} <b>${r.distance}</b></span>`).join('')}</div>` +
+  note('The number is how many single-letter edits it takes to turn what you typed into that word. Smallest wins, so that is the "did you mean".');
+
+R['edit'] = d => stats(stat('Levenshtein', d.levenshtein), stat('Damerau (swap = 1)', d.damerau), stat('weighted', d.weighted)) +
+  grid(d.a, d.b, d.table, d.path) +
+  `<div class="chips">${d.ops.map(o => { const k = o[0]; const lab = k === 'M' ? o.slice(2) : k === 'S' ? o.slice(2).replace('>', ' → ') : (k === 'I' ? '+' : '−') + o.slice(2); return `<span class="chip ${k === 'M' ? '' : k === 'S' ? 'gold' : k === 'I' ? 'good' : 'bad'}">${esc(lab)}</span>`; }).join('')}</div>` +
+  note('Red outlined cells are the cheapest path. Chips below read it left to right: plain = keep, gold = swap a letter, green + = add, red − = delete. Weighted mode makes vowel↔vowel swaps half price.');
+
+R['align'] = d => stats(stat('score', d.score), stat('identity', num(d.identity, 0) + '%'), stat('matches', d.matches), stat('mismatches', d.mismatches), stat('gap letters', d.gapChars)) +
+  `<div class="align">${esc(d.alignedA)}\n${esc(d.midline)}\n${esc(d.alignedB)}</div>` +
+  (d.table.length <= 40 && d.table[0].length <= 40 ? grid(d.alignedA.replace(/-/g, ''), d.alignedB.replace(/-/g, ''), d.table, d.path, '--green') : '') +
+  note('| = match, . = mismatch, - = gap. Local mode only shows the best matching region; the table is clamped at 0.');
+
+R['matrix'] = d => stats(stat('best cost', d.cost.toLocaleString()), stat('left to right', d.leftToRight.toLocaleString()), stat('saved', d.saved.toLocaleString())) + `<div class="align">${esc(d.parens)}</div>` + note('Cost counts the number multiplications. Same answer matrix, very different work depending on the order you bracket them.');
+
+R['obst'] = d => {
+  const n = d.keys.length, depth = new Array(n).fill(0);
+  (function walk(i, dp) { if (i < 0) return; depth[i] = dp; walk(d.left[i], dp + 1); walk(d.right[i], dp + 1); })(d.root, 0);
+  const W = 60 + n * 44, H = 40 + (Math.max(...depth) + 1) * 54;
+  let body = '';
+  const X = i => 30 + i * 44, Y = i => 28 + depth[i] * 54;
+  d.keys.forEach((k, i) => { [d.left[i], d.right[i]].forEach(c => { if (c >= 0) body += `<line x1="${X(i)}" y1="${Y(i)}" x2="${X(c)}" y2="${Y(c)}" stroke="${COL.mute}"/>`; }); });
+  d.keys.forEach((k, i) => { body += `<circle cx="${X(i)}" cy="${Y(i)}" r="${8 + Math.sqrt(d.freq[i]) * 1.2}" fill="${i === d.root ? COL.gold : COL.green}" opacity=".85"><title>${esc(k)} (${d.freq[i]} lookups)</title></circle><text x="${X(i)}" y="${Y(i) + 4}" text-anchor="middle" style="fill:#fff;font-weight:700">${esc(k.slice(0, 2))}</text>`; });
+  return stats(stat('optimal cost', d.cost), stat('balanced tree cost', d.balancedCost, 'if you ignore popularity'), stat('O(n³) steps', d.opsCubic), stat('Knuth O(n²) steps', d.opsKnuth)) +
+    svg(W, H, body) + note('Bigger circles are searched more often. The optimal tree puts popular crops near the top (gold is the root), even if that makes it lopsided. Knuth\'s trick reaches the same answer with far fewer steps.');
+};
+
+function routeMap(nodes, order, color) {
+  const pts = order.map(i => nodes[i]);
+  const pl = pts.map(p => `${p.x * 2 + 10},${p.y * 2 + 10}`).join(' ') + ` ${pts[0].x * 2 + 10},${pts[0].y * 2 + 10}`;
+  return svg(220, 220, `<polyline points="${pl}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round"/>` +
+    pts.map((p, i) => `<circle cx="${p.x * 2 + 10}" cy="${p.y * 2 + 10}" r="${i === 0 ? 7 : 5}" fill="${i === 0 ? COL.gold : color}"/><text x="${p.x * 2 + 15}" y="${p.y * 2 + 5}">${i}</text>`).join(''));
+}
+R['route'] = d => stats(stat('exact (bitmask DP)', num(d.exact.cost, 1), `${d.exact.states.toLocaleString()} states, ${num(d.exact.millis, 2)} ms`),
+    stat('nearest neighbour', num(d.nearest.cost, 1), `${num(d.nearest.cost / d.exact.cost * 100 - 100, 0)}% longer`),
+    stat('MST 2-approx', num(d.mst.cost, 1), `${num(d.mst.cost / d.exact.cost, 2)}× optimal (limit 2×)`),
+    stat('MST weight', num(d.mst.lowerBound, 1), 'a floor no tour can beat')) +
+  `<div class="maps"><div><h4>Exact, shortest possible</h4>${routeMap(d.nodes, d.exact.order, COL.green)}</div><div><h4>Nearest neighbour</h4>${routeMap(d.nodes, d.nearest.order, COL.coral)}</div><div><h4>MST preorder</h4>${routeMap(d.nodes, d.mst.order, COL.blue)}</div></div>` +
+  note(`Gold dot = start (number 0 is the first stop). Exact DP looks at up to ${d.bitmaskStatesMax.toLocaleString()} states, and that number doubles with every farm you add.`);
+
+R['hamilton'] = d => d.exists ? `<div class="chips">${d.path.map(x => `<span class="chip good">${x}</span>`).join('<span style="padding:3px">→</span>')}</div>` + note('A route that visits every spot exactly once exists.') : `<span class="chip bad">No route visits every spot exactly once</span>`;
+
+R['setcover'] = d => {
+  const names = ms => ms.map(i => d.packages[i]);
+  const cov = ms => { let m = 0; ms.forEach(i => m |= d.masks[i]); return d.labels.filter((_, b) => m & (1 << b)); };
+  if (!d.coverable) return '<span class="chip bad">Some problem isn\'t treated by any package.</span>';
+  return `<div class="two"><div><b class="good">Exact: ${d.exact.length} packages</b>${chips(names(d.exact), 'good')}</div><div><b class="bad">Greedy: ${d.greedy.length} packages</b>${chips(names(d.greedy), d.greedy.length > d.exact.length ? 'bad' : 'good')}</div></div>` +
+    `<b>Everything covered</b>${chips(cov(d.exact))}` +
+    note(`Greedy keeps grabbing "the package that fixes the most problems right now" and can end up with more packages than needed. Exact DP tried all ${d.exactMillis < 1 ? 'combinations in under 1 ms' : 'combinations'} here, but it doubles in cost per extra problem.`);
+};
+
+function layoutTree(n, parent) {
+  const kids = Array.from({length: n}, () => []); let root = 0;
+  for (let v = 0; v < n; v++) { if (parent[v] === v) root = v; else kids[parent[v]].push(v); }
+  const depth = new Array(n).fill(0), x = new Array(n).fill(0); let leaf = 0, maxd = 0;
+  (function go(v, dp) { depth[v] = dp; maxd = Math.max(maxd, dp); if (!kids[v].length) { x[v] = leaf++; return; } kids[v].forEach(c => go(c, dp + 1)); x[v] = kids[v].reduce((s, c) => s + x[c], 0) / kids[v].length; })(root, 0);
+  return {depth, x, leaves: leaf, maxd};
+}
+R['tree'] = d => {
+  const L = layoutTree(d.n, d.parent), W = 40 + L.leaves * 70, H = 50 + L.maxd * 70;
+  const X = v => 35 + L.x[v] * 70, Y = v => 28 + L.depth[v] * 70;
+  const onPath = new Set(); for (let i = 1; i < d.diameterPath.length; i++) onPath.add(d.diameterPath[i-1] + '-' + d.diameterPath[i]).add(d.diameterPath[i] + '-' + d.diameterPath[i-1]);
+  let body = '';
+  for (let i = 0; i < d.eu.length; i++) { const a = d.eu[i], b = d.ev[i], hot = onPath.has(a + '-' + b);
+    body += `<line x1="${X(a)}" y1="${Y(a)}" x2="${X(b)}" y2="${Y(b)}" stroke="${hot ? COL.gold : COL.mute}" stroke-width="${hot ? 5 : 2}"/><text class="lbl" x="${(X(a)+X(b))/2}" y="${(Y(a)+Y(b))/2}" text-anchor="middle">${d.ew[i]}</text>`; }
+  for (let v = 0; v < d.n; v++) body += `<circle cx="${X(v)}" cy="${Y(v)}" r="15" fill="${d.picked[v] ? COL.green : 'var(--card)'}" stroke="${v === d.bestHub ? COL.blue : COL.mute}" stroke-width="${v === d.bestHub ? 4 : 1.5}"/><text x="${X(v)}" y="${Y(v) + 4}" text-anchor="middle" style="${d.picked[v] ? 'fill:#fff;' : ''}font-weight:700">${v}</text>`;
+  return stats(stat('diameter (longest pipe run)', d.diameter), stat('best pump spot', 'node ' + d.bestHub, `total distance ${d.sumDist[d.bestHub]}`), stat('centroid', 'node ' + d.centroid), stat('best non-adjacent yield', d.maxIndependent)) +
+    svg(W, H, body) + note('Gold path = diameter. Blue ring = best place for a pump (smallest sum of distances to every field, found by rerooting). Green nodes = the most yield you can pick with no two neighbouring fields both chosen. Numbers on pipes are lengths.') +
+    `<b>Total distance from each node</b>${cells(d.sumDist.map(String), [d.bestHub])}`;
+};
+
+R['sos'] = d => {
+  const pk = d.package; const bits = d.labels.filter((_, b) => pk & (1 << b));
+  return stats(stat('farms', d.farms), stat('fully handled by package', d.fullyHandled), stat('still have a problem', d.notHandled), stat('SOS steps', d.fastOps), stat('brute-force steps', d.slowOps)) +
+    `<div class="note">A package that handles: ${bits.length ? bits.map(esc).join(', ') : 'nothing'}</div>` +
+    `<b>For every possible package: how many farms are fully covered</b>${cells(d.covered.map(String), [pk])}` +
+    note('Cell number = package as a bit pattern (bit 0 = ' + esc(d.labels[0]) + '). SOS DP fills the whole table in k·2ᵏ steps instead of 3ᵏ.');
+};
+
+R['greedy'] = d => `<div class="two"><div><b>Biggest-bag-first</b>${d.greedy ? chips(d.greedy.map(String), d.dp && d.greedy.length > d.dp.length ? 'bad' : 'good') + `<div class="note">${d.greedy.length} bags</div>` : '<span class="chip bad">got stuck</span>'}</div>
+  <div><b>DP (tries everything smartly)</b>${d.dp ? chips(d.dp.map(String), 'good') + `<div class="note">${d.dp.length} bags</div>` : '<span class="chip bad">impossible</span>'}</div></div>` +
+  (d.greedy && d.dp && d.greedy.length > d.dp.length ? note('Greedy lost. When the best local choice isn\'t the best overall choice, you need DP.') : note('Here greedy happens to be fine (e.g. 1, 5, 10 style sizes). DP always works, greedy only sometimes.'));
+
+R['flow'] = d => {
+  const n = d.nodes.length, lvl = new Array(n).fill(-1); lvl[d.s] = 0; const qq = [d.s];
+  while (qq.length) { const u = qq.shift(); d.edges.forEach(e => { if (e.u === u && lvl[e.v] < 0) { lvl[e.v] = lvl[u] + 1; qq.push(e.v); } }); }
+  const mx = Math.max(...lvl, 1); for (let i = 0; i < n; i++) if (lvl[i] < 0) lvl[i] = mx + 1;
+  const maxL = Math.max(...lvl), per = {}; lvl.forEach((l, i) => (per[l] = per[l] || []).push(i));
+  const W = 780, H = 80 + Math.max(...Object.values(per).map(a => a.length)) * 70, pos = [];
+  for (const l in per) per[l].forEach((v, k) => pos[v] = [60 + l * (W - 160) / Math.max(1, maxL), (H / (per[l].length + 1)) * (k + 1)]);
+  let body = `<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M0 0L10 5L0 10z" fill="${COL.mute}"/></marker></defs>`;
+  d.edges.forEach(e => {
+    const [x1, y1] = pos[e.u], [x2, y2] = pos[e.v], dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy) || 1, ux = dx / len, uy = dy / len;
+    const col = e.cut ? COL.coral : e.flow > 0 ? COL.blue : COL.mute;
+    body += `<line x1="${x1 + ux * 18}" y1="${y1 + uy * 18}" x2="${x2 - ux * 20}" y2="${y2 - uy * 20}" stroke="${col}" stroke-width="${1.5 + 4 * e.flow / Math.max(1, e.cap)}" ${e.cut ? 'stroke-dasharray="6 4"' : ''} marker-end="url(#ar)"/><text class="lbl" x="${(x1 + x2) / 2}" y="${(y1 + y2) / 2 - 4}" text-anchor="middle" style="fill:${col}">${e.flow}/${e.cap}</text>`;
+  });
+  d.nodes.forEach((nm, i) => body += `<circle cx="${pos[i][0]}" cy="${pos[i][1]}" r="17" fill="${d.sourceSide[i] ? COL.gold : 'var(--card)'}" stroke="${i === d.s || i === d.t ? COL.ink : COL.mute}" stroke-width="${i === d.s || i === d.t ? 3 : 1.5}"/><text x="${pos[i][0]}" y="${pos[i][1] + 34}" text-anchor="middle">${esc(nm)}</text>`);
+  let extra = d.algo === 'Dinic'
+    ? stat('BFS phases', d.phases, 'flow per phase: ' + d.phaseFlow.join(', ')) : stat('augmenting paths', d.augmentations);
+  let trace = '';
+  if (d.trace) trace = `<b>Augmenting paths, in the order Edmonds-Karp found them</b><ol class="plain">${d.trace.map(t => `<li>${t.path.map(i => esc(d.nodes[i])).join(' → ')} <b>+${t.amount}</b></li>`).join('')}</ol>`;
+  if (d.levels && d.levels.length) trace = `<b>Dinic level graph (distance from source), phase 1</b>${chips(d.nodes.map((nm, i) => nm + ': ' + d.levels[0][i]))}`;
+  return stats(stat('max flow', d.maxFlow), stat('min cut capacity', d.cutCapacity, 'always equal'), stat(esc(d.algo), esc(d.complexity)), extra) + svg(W, H, body) +
+    note('Label = water flowing / pipe capacity. Red dashed pipes are the minimum cut: the cheapest set of pipes whose removal separates the source from the sink. Gold nodes are the source side. Squeeze any of these pipes and the max flow drops.') + trace;
+};
+
+R['matching'] = d => {
+  const nl = d.left.length, nr = d.right.length, H = 40 + Math.max(nl, nr) * 46;
+  const yl = i => 30 + i * 46, yr = j => 30 + j * 46 * (nl / Math.max(nl, nr) > 0 ? 1 : 1);
+  const matched = new Set(d.pairs.map(p => p.left + '-' + p.right));
+  let body = '';
+  d.edgesFrom.forEach((u, i) => { const v = d.edgesTo[i], m = matched.has(u + '-' + v); body += `<line x1="150" y1="${yl(u)}" x2="450" y2="${yr(v)}" stroke="${m ? COL.green : COL.line}" stroke-width="${m ? 4 : 1.5}"/>`; });
+  d.left.forEach((nm, i) => body += `<circle cx="150" cy="${yl(i)}" r="9" fill="${d.coverL[i] ? COL.coral : 'var(--card)'}" stroke="${COL.mute}"/><text x="135" y="${yl(i) + 4}" text-anchor="end">${esc(nm)}</text>`);
+  d.right.forEach((nm, j) => body += `<circle cx="450" cy="${yr(j)}" r="9" fill="${d.coverR[j] ? COL.coral : 'var(--card)'}" stroke="${COL.mute}"/><text x="465" y="${yr(j) + 4}">${esc(nm)}</text>`);
+  return stats(stat('farmers matched', d.size + ' of ' + nl), stat('left out', d.unmatched), stat('min vertex cover', d.size, 'König: same number')) +
+    svg(600, H, body) + note('Green lines = who gets which machine. Red-filled nodes = the smallest set of people/machines that touches every possible pairing. Its size always equals the matching size (König\'s theorem), which proves nobody could do better.');
+};
+
+R['mcmf'] = d => stats(stat('tonnes moved', d.totalFlow, `supply ${d.supplyTotal}, demand ${d.demandTotal}`), stat('total cost', d.totalCost.toLocaleString()), stat('cheapest-path rounds', d.rounds)) +
+  table(['', ...d.markets.map(esc), 'sent'], d.farmers.map((f, i) => [`<b>${esc(f)}</b> (${d.supply[i]})`, ...d.flow[i].map((v, j) => v ? `<b>${v}</b> <small>@${d.cost[i][j]}</small>` : '<span style="opacity:.35">·</span>'), d.flow[i].reduce((a, b) => a + b, 0)])) +
+  `<b>What the algorithm did, cheapest road first</b><ol class="plain">${d.steps.map(s => `<li>push ${s.amount} t along a route costing ${s.unitCost}/t</li>`).join('')}</ol>` +
+  note('Bold = tonnes sent, small number = cost per tonne. Successive shortest paths always take the cheapest remaining route, even if that means undoing part of an earlier one.');
+
+R['projects'] = d => stats(stat('best profit', d.best), stat('if you could ignore prerequisites', d.sumOfPositives), stat('min cut', d.minCut)) +
+  `<div class="chips">${d.items.map((nm, i) => `<span class="chip ${d.chosen[i] ? 'good' : ''}" style="${d.chosen[i] ? '' : 'opacity:.55'}">${d.chosen[i] ? '✓' : '✗'} ${esc(nm)}</span>`).join('')}</div>` +
+  note('Growing something earns money but needs equipment that costs money. Choosing a crop forces you to also buy what it needs. The best set of choices is a minimum cut in a flow network.');
+
+R['vcover'] = d => {
+  const n = d.n, cx = 150, cy = 140, r = 105, P = i => [cx + r * Math.cos(2 * Math.PI * i / n - Math.PI / 2), cy + r * Math.sin(2 * Math.PI * i / n - Math.PI / 2)];
+  const mset = new Set(d.matchingEdges);
+  let body = '';
+  d.eu.forEach((u, i) => { const [a, b] = P(u), [c, e] = P(d.ev[i]); body += `<line x1="${a}" y1="${b}" x2="${c}" y2="${e}" stroke="${mset.has(i) ? COL.gold : COL.mute}" stroke-width="${mset.has(i) ? 5 : 1.5}"/>`; });
+  for (let i = 0; i < n; i++) { const [x, y] = P(i); body += `<circle cx="${x}" cy="${y}" r="14" fill="${d.exact[i] ? COL.green : 'var(--card)'}" stroke="${d.approx[i] ? COL.gold : COL.mute}" stroke-width="${d.approx[i] ? 4 : 1.5}"/><text x="${x}" y="${y + 4}" text-anchor="middle" style="${d.exact[i] ? 'fill:#fff;' : ''}font-weight:700">${i}</text>`; }
+  const f = d.fpt;
+  return stats(stat('exact minimum', d.exactSize), stat('2-approximation', d.approxSize, `ratio ${num(d.ratio, 2)} (limit 2)`), stat('independent set', d.independentSize, 'the left-over fields')) +
+    `<div class="two"><div>${svg(300, 280, body)}</div><div>
+    <p class="note"><b>Green fill</b> = exact best traps/sensors. <b>Gold ring</b> = what the 2-approx picked. <b>Thick gold edges</b> = the matching it grabbed both ends of.</p>
+    <b>FPT search for k = ${f.k}</b>
+    ${f.kernelRejected ? '<p class="bad">The kernel rule proves no cover of this size exists, before any branching.</p>' : `<p>${f.found ? '<span class="good">Found a cover.</span>' : '<span class="bad">No cover this small exists.</span>'} Search tree visited <b>${f.branches}</b> nodes (worst case ${f.bound.toLocaleString()}). Kernel forced ${f.forced} node(s) in.</p>`}
+    <p class="note">The complement of a cover is an independent set; the same nodes are a clique in the complement graph: ${d.isCliqueInComplement ? '<span class="good">checked ✓</span>' : '<span class="bad">failed</span>'}. That is the VERTEX-COVER ↔ INDEPENDENT-SET ↔ CLIQUE link from the reduction zoo.</p></div></div>`;
+};
+
+R['knapsack'] = d => {
+  const row = (nm, r) => [nm, r.value, r.weight, num(r.ratio * 100, 1) + '%'];
+  return stats(stat('budget', d.cap), stat('ε for FPTAS', d.eps), stat('DP table cells', d.dpCells.toLocaleString())) +
+    table(['method', 'value', 'cost used', '% of best'], [row('Exact DP', d.exact), row('Greedy by value/cost', d.greedy), row('Greedy + best single crop (½-approx)', d.greedyHalf), row(`FPTAS (guarantees ≥ ${num((1 - d.eps) * 100, 0)}%)`, d.fptas)]) +
+    `<b>Crops picked by exact DP</b>${chips(d.names.filter((_, i) => d.exact.take[i]), 'good')}` +
+    note('Try the trap example: greedy takes the shiny cheap item and can then not fit the big valuable one.');
+};
+
+R['subsetsum'] = d => d.possible ? `<span class="chip good">Yes: ${d.indices.slice().reverse().map(i => d.nums[i]).join(' + ')} = ${d.sum}</span>` + note('That list is a certificate. Checking it takes one addition pass, which is the whole definition of NP: hard to find, easy to verify.') : '<span class="chip bad">No combination adds up to that.</span>';
+
+R['prime'] = d => stats(stat('exact verdict', d.isPrime ? 'prime' : 'composite'), stat(`Miller-Rabin, ${d.rounds} random rounds`, d.probablyPrime ? 'probably prime' : 'composite'), stat('error chance if it says prime', d.errorBound.toExponential(1))) +
+  (d.tests.length ? table(['base a', 'Miller-Rabin says', 'plain Fermat says'], d.tests.map(t => [t.a, t.witness ? '<b class="bad">composite (a is a witness)</b>' : 'no proof either way', t.fermatPasses ? 'looks prime' : '<b class="bad">composite</b>'])) : note('Pick an odd number above 3 to see the witnesses.')) +
+  (d.s !== undefined ? note(`n − 1 = ${d.d} × 2<sup>${d.s}</sup>. Miller-Rabin raises a to ${d.d} and squares it up to ${d.s} times looking for a break in the pattern.`) : '') +
+  (d.carmichael ? '<p class="bad"><b>Carmichael number:</b> every base that shares no factor with it fools the Fermat test. Miller-Rabin still catches it.</p>' : '') +
+  (d.trialDivision !== undefined ? note(`Slow check by trial division agrees: ${d.trialDivision ? 'prime' : 'composite'}.`) : note('Too big for trial division, which is exactly why we use Miller-Rabin.'));
+
+R['qsort'] = d => stats(stat('items', d.n), stat('input', esc(d.mode))) +
+  bars([{l: 'first-element pivot', v: d.firstPivot.comparisons, c: COL.coral, note: `recursion depth ${d.firstPivot.depth}`}, {l: 'random pivot (average)', v: d.randomPivot.avg, c: COL.green, note: `min ${d.randomPivot.min}, max ${d.randomPivot.max}`},
+    {l: 'theory: 2(n+1)Hₙ − 4n', v: d.expected, c: COL.blue}, {l: 'n·log₂n', v: d.nLog2n, c: COL.mute}, {l: 'n²/2', v: d.quadratic, c: COL.line}]) +
+  note(`Over ${d.trials} runs the random version was always sorted correctly (Las Vegas: answer never wrong, only the time varies). Average depth ${num(d.randomPivot.avgDepth, 0)}.`);
+
+R['hash'] = d => stats(stat('words hashed', d.keys), stat('buckets', d.m)) +
+  `<b>Normal words</b>` + bars([{l: 'universal hash (avg colliding pairs)', v: d.universal.avg, c: COL.green, note: `bound ${num(d.universal.bound, 1)}, range ${d.universal.min}–${d.universal.max}`}, {l: '“add up the letters” hash', v: d.sumHash.collidingPairs, c: COL.gold}]) +
+  `<b>Attack: all ${d.anagrams.keys} anagrams of “crops”</b>` + bars([{l: 'universal hash (avg)', v: d.anagrams.universalAvgPairs, c: COL.green, note: `bound ${num(d.anagrams.bound, 1)}`}, {l: '“add up the letters” hash', v: d.anagrams.sumHashCollidingPairs, c: COL.coral, note: d.anagrams.sumHashAllSameBucket ? 'every word in ONE bucket' : ''}]) +
+  `<b>Perfect hashing (FKS) over the ${d.fks.n} words</b>` + stats(stat('level-1 tries', d.fks.attemptsLevel1), stat('level-2 tries total', d.fks.attemptsLevel2), stat('table space', d.fks.space, `${num(d.fks.space / d.fks.n, 1)}× the words`), stat('false hits in 5000 random probes', d.fks.falseHits)) +
+  `<div class="note">Lookup of “${esc(d.fks.lookupWord)}”: ${d.fks.lookupFound ? '<span class="good">found</span>' : '<span class="bad">not found</span>'} in exactly two hash computations. All stored words found: ${d.fks.allFound ? '<span class="good">yes</span>' : '<span class="bad">no</span>'}.</div>`;
+
+R['reservoir'] = d => {
+  const W = 760, H = 180, bw = (W - 40) / d.n, mx = Math.max(...d.counts, d.expected) * 1.15;
+  let body = d.counts.map((c, i) => `<rect x="${30 + i * bw}" y="${H - 20 - c / mx * (H - 40)}" width="${Math.max(1, bw - 2)}" height="${c / mx * (H - 40)}" fill="${COL.gold}"/>`).join('');
+  const ey = H - 20 - d.expected / mx * (H - 40);
+  body += `<line x1="30" x2="${W - 10}" y1="${ey}" y2="${ey}" stroke="${COL.coral}" stroke-width="2" stroke-dasharray="5 4"/><text x="34" y="${ey - 5}">expected ${num(d.expected, 0)}</text><text x="30" y="${H - 5}">stream position 0 → ${d.n - 1}</text>`;
+  return stats(stat('stream length', d.n), stat('kept', d.k), stat('runs', d.trials.toLocaleString()), stat('worst deviation', num(d.worstDeviationPct, 1) + '%')) + svg(W, H, body) +
+    `<b>One sample (stream positions)</b>${cells(d.oneSample.map(String))}` + note('Each bar counts how often that stream position ended up in the kept sample. Flat bars = every item had the same chance, even though the algorithm never knew how long the stream would be.');
+};
+
+R['parallel'] = d => stats(stat('numbers', d.n.toLocaleString()), stat('CPU cores here', d.cpus)) +
+  d.ops.map(o => `<h4 style="margin:14px 0 4px">${esc(o.name)}</h4>` + stats(stat('work T₁', o.work.toLocaleString()), stat('span T∞', o.span.toLocaleString()), stat('parallelism T₁/T∞', num(o.parallelism, 0)), stat('sequential', num(o.seqMillis, 2) + ' ms')) +
+    table(['threads', 'time (ms)', 'measured speed-up', 'Brent: best possible', 'correct'], o.runs.map(r => [r.threads, num(r.millis, 2), num(r.speedup, 2) + '×', num(r.brentSpeedup, 2) + '×', r.correct ? '<span class="good">✓</span>' : '<span class="bad">✗</span>']))).join('') +
+  note('Brent\'s theorem says T<sub>p</sub> ≤ T₁/p + T∞, which is a ceiling that assumes free threads. Measured speed-ups are usually lower: starting threads costs time, and adding numbers is limited by memory speed. Merge sort with a one-thread merge has span about 2n, so its parallelism is only about log n. Asking for more threads than cores (see the core count) cannot help.');
+
+/* ============================ lab definitions ============================ */
+const L = (id, mod, title, api, eli, fields, opts={}) => ({id, mod, title, api, eli, fields, ...opts});
+const F = (n, l, v, o={}) => ({n, l, v, ...o});
+
+const MODULES = [
+  {n: 1, name: 'TextHack as a system', sub: 'What the engine answers, and which algorithm family does it', c: 'var(--ink)'},
+  {n: 2, name: 'String algorithms', sub: 'Pattern search, many patterns at once, suffix structures', c: 'var(--blue)'},
+  {n: 3, name: 'Advanced dynamic programming', sub: 'Edit distance, alignment, interval, bitmask, tree and subset DP', c: 'var(--green)'},
+  {n: 4, name: 'Network flow', sub: 'Max-flow, min-cut, matching, min-cost assignment', c: 'var(--teal)'},
+  {n: 5, name: 'NP-completeness and approximation', sub: 'When exact answers explode and what to do instead', c: 'var(--coral)'},
+  {n: 6, name: 'Randomised and parallel algorithms', sub: 'Coins, hashing, sampling, threads', c: 'var(--violet)'}
+];
+
+const LABS = [
+  L('engine', 1, 'What can AgriFlow answer?', 'engine', 'AgriFlow is a search-and-answer machine. Different questions need different tools, just like you would not use a hammer to cut paper. This table is the map from "what someone asks" to "which algorithm family does the work".', [], {auto: true}),
+  L('similar', 1, 'Find similar records', 'similar', 'Two records are "similar" if they share a long chunk of identical text. A suffix array lets the computer find the longest shared chunk without checking every starting spot.', [F('id', 'Compare against record #', '1', {t: 'select', opts: Array.from({length: 15}, (_, i) => [i + 1, `${i + 1}`])})], {cost: 'suffix array of a#b, O(n log² n) per pair'}),
+
+  L('search', 2, 'Pattern search on the knowledge base', 'search', 'You want to find a word inside a pile of text. The slow way is sliding the word along one letter at a time. KMP, Z and Rabin-Karp are smarter ways to never re-read letters (or to compare quick "fingerprints" first).', [F('q', 'Look for', 'blight', {w: 2}), F('algorithm', 'Algorithm', 'kmp', {t: 'select', opts: [['naive', 'Naive'], ['kmp', 'KMP'], ['z', 'Z-function'], ['rabin-karp', 'Rabin-Karp']]})], {cost: 'naive O(n·m) · KMP, Z O(n+m) · Rabin-Karp average O(n+m)'}),
+  L('strlab', 2, 'KMP, Z and Rabin-Karp up close', 'strlab', 'KMP builds a cheat sheet from the pattern (the lps table) so after a wrong letter it knows exactly how far to jump back. Rabin-Karp turns each window of letters into a number (a "fingerprint") and only looks closely when fingerprints match. Tiny fingerprints cause fake matches, so use big or random ones.', [F('t', 'Text', 'ababcabcabababd', {w: 3}), F('p', 'Pattern', 'ababd'), F('mod', 'Weak hash modulus', '13', {s: true})], {cost: 'lps in O(m) · scan in O(n) · hash update O(1)'}),
+  L('race', 2, 'Race: which is fastest?', 'race', 'Same job, different methods, stopwatch running. On normal text they are all quick. On a nasty "aaaa…ab" input the naive way falls apart and KMP does not. This is why we care about worst cases, not just usual cases.', [F('mode', 'Text', 'adversarial', {t: 'select', opts: [['adversarial', 'Nasty: aaaa…a vs aaa…ab'], ['corpus', 'Farm records repeated']]}), F('n', 'Length (nasty mode)', '20000', {s: true}), F('m', 'Pattern length', '60', {s: true}), F('scale', 'Repeat count (records mode)', '200', {s: true}), F('q', 'Word (records mode)', 'blight')], {cost: 'measured on your machine, best of 3 after warm-up'}),
+  L('multi', 2, 'Many words, one pass (Aho-Corasick)', 'multi', 'Imagine searching for 7 disease names. You could read the text 7 times, or build one tiny map (a trie with "if you slip, go here" shortcuts called failure links) and read the text once. Leave "text" empty to scan all farm records.', [F('words', 'Words (comma separated)', 'blast,rust,blight,wilt,rot,curl,tikka', {w: 3}), F('text', 'Your own text (optional)', '', {w: 3})], {cost: 'build O(Σ|pattern|) · scan O(n + matches)'}),
+  L('suffix', 2, 'Suffix array search', 'suffix', 'Write down every ending of the text (every suffix) and sort them like a dictionary. Now any word you look for sits in one tidy block, found by binary search, like finding a name in a phone book. The LCP numbers say how many letters neighbours share.', [F('q', 'Look for', 'blight', {w: 2})], {cost: 'build O(n log² n) in this code (SA-IS would be O(n)) · query O(m log n)'}),
+  L('repeats', 2, 'Longest repeated text (LCP array)', 'repeats', 'Neighbours in the sorted suffix list share the most letters when the text repeats itself. Scan the LCP array once for its biggest number and you have the longest repeat. The same array also counts every different substring.', [], {cost: 'Kasai O(n), then O(n) scan'}),
+
+  L('edit-distance', 3, 'Did you mean…? (fuzzy search)', 'edit-distance', 'Typos happen. Edit distance counts the fewest single-letter changes (add, remove, swap one letter) needed to turn your word into another word. The closest word is your best guess. Damerau mode also counts swapping two neighbouring letters as one edit.', [F('q', 'Type a messy word', 'blsat'), F('mode', 'Mode', 'lev', {t: 'select', opts: [['lev', 'Levenshtein'], ['dam', 'Damerau (swap = 1)']]})], {cost: 'O(m·n) per word'}),
+  L('edit', 3, 'The edit-distance table', 'edit', 'The computer fills a grid. Each cell answers "how many edits to turn the first i letters of A into the first j letters of B?", using the three cells next to it. Follow the cheapest route back from the corner to read off the actual edits.', [F('a', 'Word A', 'blast'), F('b', 'Word B', 'balst'), F('wi', 'Add costs', '2', {s: true}), F('wd', 'Delete costs', '2', {s: true}), F('ws', 'Swap costs', '3', {s: true})], {cost: 'Wagner-Fischer O(m·n)'}),
+  L('align', 3, 'Sequence alignment (like DNA matching)', 'align', 'Line two strings up so the matching letters sit on top of each other, adding gaps where needed. Global lines up everything (Needleman-Wunsch). Local finds the best matching stretch inside longer strings (Smith-Waterman). Affine makes opening a gap expensive but making it longer cheap, because one long missing chunk is more likely than many tiny ones.', [F('a', 'Sequence A', 'xxagriflowyy'), F('b', 'Sequence B', 'agriflow'), F('mode', 'Mode', 'local', {t: 'select', opts: [['global', 'Global'], ['local', 'Local'], ['affine', 'Global, affine gaps']]}), F('match', 'Match', '2', {s: true}), F('mismatch', 'Mismatch', '-1', {s: true}), F('gap', 'Gap', '2', {s: true}), F('open', 'Open gap', '4', {s: true}), F('extend', 'Extend gap', '1', {s: true})], {cost: 'O(m·n)'}),
+  L('matrix', 3, 'Matrix chain order (interval DP)', 'matrix', 'When you multiply a row of tables together, the final answer is the same whichever way you bracket them, but the work is not. Interval DP tries every split point for every stretch and remembers the best, working from short stretches to long ones. Think of it as ordering table joins in a query planner.', [F('dims', 'Sizes (k+1 numbers for k tables)', '40,20,30,10,30', {w: 2})], {cost: 'O(n³)'}),
+  L('obst', 3, 'Optimal search tree for crops', 'obst', 'If people look up Rice all day and Mustard once a week, put Rice near the top. Optimal BST picks the best root for every stretch of crops using interval DP. Knuth noticed the best root only moves one way, which cuts the work a lot.', [F('freq', 'Lookups per crop (A→Z order: Banana, Chilli, Cotton, Groundnut, Maize, Mustard, Paddy, Pigeon Pea, Potato, Rice, Soybean, Sugarcane, Tomato, Turmeric, Wheat)', '30,12,9,6,4,3,22,8,5,10,14,2,18,7,25', {t: 'area'})], {cost: 'O(n³) plain · O(n²) with Knuth'}),
+  L('route', 3, 'Visit every farm: shortest route (bitmask DP)', 'route', 'A field officer must visit every chosen farm and come home. The bitmask remembers exactly which farms are done as a row of 1s and 0s, so each state is "which are done and where am I". It is perfect but doubles with every extra farm, so we compare it with two quicker approximations.', [F('pick', 'Farms to visit', '0,1,2,3,4,5,6,7', {t: 'checks', opts: SITES.map((s, i) => [i, s])})], {cost: 'exact O(2ⁿ·n²) · nearest neighbour O(n²) · MST preorder O(n²), ≤ 2× optimal'}),
+  L('hamilton', 3, 'Can one trip pass every farm exactly once?', 'hamilton', 'Same bitmask idea, but now the question is yes/no: is there a road route that touches every place exactly once? Edges are roads between numbered farms.', [F('n', 'Farms', '8', {s: true}), F('edges', 'Roads (a-b, comma separated)', '0-1,1-2,2-3,3-4,4-5,5-6,6-7,1-5,2-6,0-4', {w: 3})], {cost: 'O(2ⁿ·n)'}),
+  L('setcover', 3, 'Cheapest set of treatments (set cover)', 'setcover', 'Each treatment package fixes a few crop problems. You want the fewest packages that fix everything. Bitmask DP tries combinations of "which problems are fixed so far". Greedy (always grab the biggest fix) is fast but can pick too many.', [F('labels', 'Problems', 'Blast,Rust,Blight,Wilt,Leaf curl,Red rot,Rhizome rot,Tikka', {w: 3}), F('sets', 'Packages (name:problem numbers; separated by ;)', 'Tricyclazole:0;Mancozeb:1,2,7;Copper fungicide:2,5,6;Trichoderma:3,6,5;Imidacloprid:4;Balanced NPK + sanitation:0,1,2;Seed treatment:3,5,7;Neem oil:4,7,1', {t: 'area'})], {cost: 'exact O(2ᵘ·sets) · greedy is a ln(n)-approximation'}),
+  L('tree', 3, 'Canal network on a tree', 'tree', 'Canals fan out like a tree. Tree DP solves each branch and combines the answers upwards. Rerooting then slides the answer from one node to its neighbour in constant time, so we know the total distance from every node to all others without redoing the work. That finds the best pump location.', [F('edges', 'Canals (a-b:length)', '0-1:4,0-2:3,1-3:5,1-4:2,2-5:6,2-6:2,4-7:3,5-8:4,5-9:1,6-10:5,8-11:2', {t: 'area'}), F('yield', 'Yield of each field (optional)', '', {w: 2})], {cost: 'every part is O(n)'}),
+  L('sos', 3, 'Treatment packages vs farm problems (SOS DP)', 'sos', 'Each farm has a mix of problems, stored as a pattern of 1s and 0s (a bitmask). A package works for a farm if it covers all of that farm\'s problems. SOS DP counts, for every possible package at once, how many farms it fully handles, by adding up subsets one bit at a time.', [F('labels', 'Problems (bit 0 first)', 'Blast,Rust,Blight,Wilt,Curl,Rot', {w: 2}), F('farms', 'Farm problem masks', '1,3,4,2,9,6,8,5,5,16,7,33,0,2,12,24,40,10,3,1', {w: 3}), F('package', 'Package mask to check', '7', {s: true})], {cost: 'O(k·2ᵏ) instead of O(3ᵏ)'}),
+  L('greedy', 3, 'When DP is the wrong tool… or greedy is', 'greedy', 'Fertilizer comes in bag sizes. Greedy takes the biggest bag that fits each time. Sometimes that is perfect, sometimes it is not. Try bags 1,3,4 for 6 kg, then 1,5,10 for 16 kg.', [F('coins', 'Bag sizes', '1,3,4'), F('target', 'Needed kg', '6', {s: true})], {cost: 'DP O(target · bags)'}),
+
+  L('flow', 4, 'Water network: max-flow and min-cut', 'flow', 'Pipes can only carry so much water. Max-flow asks how much can reach the field tank. Ford-Fulkerson keeps finding a route with spare room and pushing water down it. Edmonds-Karp always uses the shortest route. Dinic works level by level. The weakest set of pipes that cuts the tank off (the min cut) has exactly the same total capacity as the max flow.', [F('algo', 'Algorithm', 'dinic', {t: 'select', opts: [['dinic', 'Dinic'], ['ek', 'Edmonds-Karp']]}), F('s', 'Source', 'Reservoir'), F('t', 'Sink', 'Field Tank'), F('edges', 'Pipes (From>To:capacity, comma separated)', 'Reservoir>Canal A:20, Reservoir>Canal B:15, Canal A>Canal B:4, Canal A>Plot 1:8, Canal A>Plot 2:7, Canal B>Plot 2:6, Canal B>Plot 3:9, Plot 1>Field Tank:9, Plot 2>Field Tank:10, Plot 3>Field Tank:8', {t: 'area'})], {cost: 'EK O(V·E²) · Dinic O(V²·E)'}),
+  L('matching', 4, 'Who gets which machine? (bipartite matching)', 'matching', 'Farmers on one side, machines on the other, a line means "can use it". Each machine serves one farmer. Turn it into a flow problem with 1-unit pipes and the max flow is the most pairs you can make.', [F('edges', 'Who can use what (Farmer>Machine)', 'Ravi>Tractor, Ravi>Sprayer, Sita>Sprayer, Sita>Pump, Joseph>Tractor, Joseph>Harvester, Meena>Harvester, Meena>Pump, Arjun>Pump, Kavya>Tractor', {t: 'area'})], {cost: 'O(E·√V) with Dinic on unit capacities'}),
+  L('mcmf', 4, 'Cheapest way to move crops to markets', 'mcmf', 'Each farmer has some tonnes, each market takes only so much, and each road has a cost per tonne. Min-cost max-flow sends goods along the cheapest route first, then the next cheapest, and can even re-route earlier choices to save money.', [F('supply', 'Farmers (name:tonnes)', 'Ravi:40, Sita:30, Joseph:25', {w: 2}), F('demand', 'Markets (name:capacity)', 'Market A:45, Market B:35, Market C:30', {w: 2}), F('cost', 'Cost per tonne (rows = farmers; separated by ;)', '4,6,9; 3,5,8; 5,4,2', {w: 2})], {cost: 'successive shortest paths: O(flow · V · E) with SPFA'}),
+  L('projects', 4, 'Which farm plan is worth it? (project selection)', 'projects', 'Each crop plan earns money but needs things that cost money. If you pick the plan you must buy what it needs. It looks like a tricky puzzle, but it is a min-cut problem.', [F('items', 'Items (Name:profit, costs are negative)', 'Grow tomatoes:50, Grow chilli:40, Grow turmeric:25, Drip system:-30, Polyhouse:-60, Mulching kit:-8, Sell at mandi:-10', {t: 'area'}), F('deps', 'Needs (Plan>Needs)', 'Grow tomatoes>Drip system, Grow tomatoes>Polyhouse, Grow tomatoes>Sell at mandi, Grow chilli>Drip system, Grow chilli>Sell at mandi, Grow turmeric>Mulching kit, Grow turmeric>Sell at mandi', {t: 'area'})], {cost: 'one max-flow'}),
+
+  L('vcover', 5, 'Pest traps: vertex cover', 'vcover', 'Fields share boundaries. You want traps on as few fields as possible so every boundary has a trap on at least one side. Finding the very best is NP-hard, which means it gets awful fast. The 2-approximation grabs any boundary not yet watched and puts traps on both sides: never worse than twice the best. FPT search is fast when the answer k is small.', [F('n', 'Fields', '10', {s: true}), F('edges', 'Shared boundaries', '0-1,0-2,0-3,0-4,1-2,3-4,4-5,5-6,5-7,6-7,7-8,8-9', {w: 3}), F('k', 'FPT: is there a cover of size ≤ k? (blank = best)', '', {s: true})], {cost: 'exact O(2ⁿ·m) · 2-approx O(m) · FPT O(2ᵏ·m)'}),
+  L('knapsack', 5, 'Choose crops within a budget (knapsack)', 'knapsack', 'You have a budget and a list of crops with a value and a cost. Pick the best set. Exact DP works but its table grows with the budget NUMBER. Greedy by value-per-cost is quick but can be badly wrong. The FPTAS rounds values to guarantee at least (1 − ε) of the best, and you choose ε.', [F('cap', 'Budget', '80', {s: true}), F('eps', 'ε (0.05 – 1)', '0.2', {s: true}), F('items', 'Crops (Name:value:cost)', 'Rice:60:20, Wheat:50:15, Tomato:70:25, Cotton:55:30, Maize:40:12, Chilli:65:18, Potato:45:22, Soybean:35:10, Mustard:30:9, Turmeric:75:28', {t: 'area'})], {cost: 'exact O(n·W) · FPTAS O(n³/ε)', extra: [['Load the greedy trap', {cap: '100', items: 'Cheap shiny:10:1, Big valuable:100:100'}]]}),
+  L('subsetsum', 5, 'Exact amount (subset sum)', 'subsetsum', 'Can some of these numbers add up to exactly the target? It is NP-complete. But if you are handed an answer, checking it is easy, and that "easy to check" is what NP means.', [F('nums', 'Numbers', '12,7,5,9,3,14,8', {w: 2}), F('target', 'Target', '30', {s: true})], {cost: 'O(n·target)'}),
+  L('npcheck', 5, 'Is my problem NP-hard? (checklist)', null, '', [], {static: `<ul class="plain"><li><b>Choosing a best subset</b> under a limit → looks like knapsack or subset sum.</li><li><b>Covering everything with as few picks as possible</b> → vertex cover or set cover.</li><li><b>Visit everything once</b> → Hamiltonian path, then TSP.</li><li><b>Satisfy a pile of yes/no rules</b> → SAT or 3-SAT.</li><li><b>Split things into groups with no clashes</b> → graph colouring or independent set.</li></ul>${note('Reduction zoo: 3-SAT → CLIQUE → INDEPENDENT-SET → VERTEX-COVER, and HAM-CYCLE → TSP. If you can turn a known NP-hard problem into yours in polynomial time, yours is at least as hard, so stop looking for a clever exact algorithm and reach for an approximation, a small-k trick, or a heuristic.')}`}),
+
+  L('prime', 6, 'Is this number prime? (Miller-Rabin)', 'prime', 'Checking big numbers by trying every divisor takes forever. Miller-Rabin picks random "test numbers" (bases). If any base proves the number is composite, it is. If none do, the chance it is secretly composite drops by at least 4× per round. Try 561: it fools the older Fermat test with most bases, but not this one.', [F('n', 'Number', '561', {w: 2}), F('rounds', 'Random rounds', '5', {s: true})], {cost: 'O(k·log² n)'}),
+  L('qsort', 6, 'Randomised quicksort', 'qsort', 'Quicksort picks a pivot and splits things into smaller and bigger. If you always pick the first item and the list is already sorted, every split is lopsided and it crawls. Picking the pivot at random makes bad luck rare on any input. The answer is always sorted, only the time is random.', [F('mode', 'Input', 'sorted', {t: 'select', opts: [['sorted', 'Already sorted'], ['reversed', 'Reversed'], ['random', 'Random'], ['dups', 'Many duplicates']]}), F('n', 'Items', '2000', {s: true}), F('trials', 'Random runs', '100', {s: true})], {cost: 'expected 2n ln n comparisons'}),
+  L('hash', 6, 'Universal and perfect hashing', 'hash', 'A hash function puts items in buckets. A fixed trick like "add up the letters" can be attacked: anagrams all land in the same bucket. Picking the function at random from a clever family (universal hashing) makes collisions rare for ANY input. Perfect hashing (FKS) uses two levels of that so lookups take exactly two hash computations, forever.', [F('m', 'Buckets', '128', {s: true}), F('trials', 'Random draws', '200', {s: true}), F('word', 'Look up a word', 'blight')], {cost: 'expected O(n) space and build, O(1) worst-case lookup'}),
+  L('reservoir', 6, 'Reservoir sampling', 'reservoir', 'Sensor readings keep arriving and you do not know how many there will be, but you want a fair random sample of k. Keep the first k. Each new item i replaces a random kept item with probability k/i. At the end every item had the same chance, using only k slots of memory.', [F('n', 'Stream length', '40', {s: true}), F('k', 'Keep', '5', {s: true}), F('trials', 'Repeat runs', '20000', {s: true})], {cost: 'O(n) time, O(k) memory'}),
+  L('parallel', 6, 'Work, span and threads', 'parallel', 'Work is the total number of steps. Span is the longest chain of steps that must happen one after another. With p workers you cannot beat work/p + span (Brent). Adding numbers and prefix sums split nicely. Merge sort with one-person merging does not: the last merge is a bottleneck.', [F('n', 'How many numbers', '1000000', {w: 1})], {cost: 'reduce span log n · scan span 2 log n · sort span ≈ 2n'})
+];
+
+/* ============================ build the page ============================ */
+const app = $('#app'), navEl = $('#nav');
+MODULES.forEach(m => {
+  navEl.insertAdjacentHTML('beforeend', `<a href="#m${m.n}" style="--c:${m.c}">Module ${m.n}<small>${m.name}</small></a>`);
+  const labs = LABS.filter(l => l.mod === m.n);
+  app.insertAdjacentHTML('beforeend', `<section class="module" id="m${m.n}" style="--mc:${m.c}"><header><h2>Module ${m.n}: ${m.name}</h2><p>${m.sub}</p></header>${labs.map(labHTML).join('')}</section>`);
+});
+navEl.insertAdjacentHTML('beforeend', '<div id="health">connecting…</div>');
+
+function fieldHTML(f) {
+  const id = 'f_' + Math.random().toString(36).slice(2, 8);
+  if (f.t === 'area') return `<label class="f grow">${f.l}<textarea name="${f.n}" data-d="${esc(f.v)}">${esc(f.v)}</textarea></label>`;
+  if (f.t === 'select') return `<label class="f">${f.l}<select name="${f.n}">${f.opts.map(([v, t]) => `<option value="${v}"${String(v) === String(f.v) ? ' selected' : ''}>${esc(t)}</option>`).join('')}</select></label>`;
+  if (f.t === 'checks') { const on = new Set(String(f.v).split(',')); return `<div class="f grow">${f.l}<div class="checks" data-checks="${f.n}">${f.opts.map(([v, t]) => `<label><input type="checkbox" value="${v}"${on.has(String(v)) ? ' checked' : ''}>${esc(t)}</label>`).join('')}</div></div>`; }
+  return `<label class="f${f.w === 3 ? ' grow' : ''}">${f.l}<input name="${f.n}" value="${esc(f.v)}" class="${f.w === 3 ? 'w3' : f.w === 2 ? 'w2' : f.s ? 's' : ''}" autocomplete="off"${f.w === 3 ? ' style="width:min(100%,520px)"' : ''}></label>`;
+}
+function labHTML(l) {
+  return `<article class="lab" id="lab-${l.id}" data-api="${l.api || ''}" data-auto="${l.auto ? 1 : ''}">
+    <h3>${l.title}</h3>${l.cost ? `<div class="cost">${l.cost}</div>` : ''}
+    ${l.eli ? `<details class="eli"><summary>Explain it like I'm 10</summary><p>${l.eli}</p></details>` : ''}
+    ${l.static ? l.static : `<form class="ctl">${l.fields.map(fieldHTML).join('')}<button class="run" type="submit">Run it</button>${(l.extra || []).map((x, i) => `<button class="alt" type="button" data-extra="${i}">${x[0]}</button>`).join('')}</form><div class="out"></div><div class="api"></div>`}
+  </article>`;
+}
+
+async function runLab(lab) {
+  const api_ = lab.dataset.api; if (!api_) return;
+  const out = $('.out', lab), apiLine = $('.api', lab), params = {};
+  lab.querySelectorAll('input[name],select[name],textarea[name]').forEach(e => params[e.name] = e.value.trim());
+  lab.querySelectorAll('[data-checks]').forEach(c => params[c.dataset.checks] = [...c.querySelectorAll('input:checked')].map(i => i.value).join(','));
+  out.innerHTML = '<span class="wait">crunching in Java…</span>';
+  try {
+    const t0 = performance.now();
+    const {data, url} = await api('/api/' + api_, params);
+    out.innerHTML = R[api_](data);
+    apiLine.textContent = 'GET ' + decodeURIComponent(url) + `   (${Math.round(performance.now() - t0)} ms round trip)`;
+  } catch (e) { out.innerHTML = `<span class="err">${esc(e.message)}</span>`; apiLine.textContent = ''; }
+}
+
+document.querySelectorAll('.lab').forEach(lab => {
+  const form = $('form', lab); if (!form) return;
+  form.addEventListener('submit', ev => { ev.preventDefault(); runLab(lab); });
+  lab.querySelectorAll('[data-extra]').forEach(b => b.addEventListener('click', () => {
+    const def = LABS.find(x => 'lab-' + x.id === lab.id).extra[b.dataset.extra][1];
+    for (const k in def) { const el = lab.querySelector(`[name="${k}"]`); if (el) el.value = def[k]; }
+    runLab(lab);
+  }));
+});
+
+// run each lab once when it first scrolls into view, so the page is alive on arrival
+const seen = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { seen.unobserve(e.target); runLab(e.target); } }), {rootMargin: '200px'});
+document.querySelectorAll('.lab').forEach(l => { if (l.dataset.api && l.id !== 'lab-parallel') seen.observe(l); });
+
+fetch('/api/health').then(r => r.json()).then(h => { $('#health').textContent = `engine up · ${h.records} records · ${h.corpusChars} chars`; }).catch(() => { $('#health').textContent = 'server not reachable'; });
+</script>
+</body>
+</html>
